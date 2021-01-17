@@ -1,31 +1,33 @@
+---
+-- Name: Door Open
+-- Desc: Give the redstone
+--
 os.loadAPI("ocs/apis/sensor")
+
+--
+-- Constants
+--
+local PROXIMITY_SENSOR_DIR = "top"
+local MONITOR_ID = "monitor_5"
+ACCEPTED_PLAYERS = {}
+ACCEPTED_PLAYERS["lxpenguin"] = true
 
 --
 -- Peripheral Devices
 --
-local proximity = sensor.wrap("top")
-local monitor = peripheral.wrap("monitor_5")
+proximity = sensor.wrap(PROXIMITY_SENSOR_DIR)
+monitor = peripheral.wrap(MONITOR_ID)
 
 --
--- Local Variables
+-- Global States
 --
-local acceptedPlayer = {}
-acceptedPlayer["lxpenguin"] = true
-local doorOpen = false
+STATE_DOOR_OPEN = false
 
-
-while true do
-
-	local playerFound = false
-
-	--
-	-- Check each entity detected by proximity sensor
-	--
+--
+-- Functions
+--
+function findAcceptedPlayers()
 	for name, value in pairs(proximity.getTargets()) do
-		if playerFound then
-			break
-		end
-
 		if value["IsPlayer"] then
 			--
 			-- Check only players
@@ -38,7 +40,7 @@ while true do
 			local inRange = (y == -1) and (-3 < x and x < 0) and (-4.5 < z and z < 0)
 			--print("x=",x, ", y=", y, ", z=", z)
 			if inRange then
-				if not doorOpen then
+				if not STATE_DOOR_OPEN then
 					monitor.clear()
 					monitor.setCursorPos(1, 1)
 					monitor.write("Scan")
@@ -50,38 +52,50 @@ while true do
 					monitor.write("On :)")
 					sleep(0.5)
 				end
-				playerFound = acceptedPlayer[username]
+				if ACCEPTED_PLAYERS[username] then
+					return true
+				end
 			end
 		end
 	end
-
-	doorOpen = playerFound or false
-	redstone.setOutput("back", doorOpen)
-	
-	monitor.clear()
-	if doorOpen then
-		monitor.setCursorPos(1, 1)
-		monitor.write("Reis")
-		monitor.setCursorPos(1, 2)
-		monitor.write("Eve")
-		monitor.setCursorPos(1, 3)
-		monitor.write("Hos")
-		monitor.setCursorPos(1, 4)
-		monitor.write("Geldin")
-	else
-		for i = 1, 3 do
-			local a = i
-			local b = 6 - i
-			monitor.setCursorPos(a + 1, a)
-			monitor.write("X")
-			monitor.setCursorPos(a + 1, b)
-			monitor.write("X")
-			monitor.setCursorPos(b + 1, a)
-			monitor.write("X")
-			monitor.setCursorPos(b + 1, b)
-			monitor.write("X")
-		end
-	end
-
-	sleep(0.2)
+	return false
 end
+
+function loop()
+	while true do
+		--
+		-- Search if one of accepted player is in range of sensor
+		--
+		STATE_DOOR_OPEN = findAcceptedPlayers() or false
+		redstone.setOutput("back", STATE_DOOR_OPEN)
+
+		monitor.clear()
+		if STATE_DOOR_OPEN then
+			monitor.setCursorPos(1, 1)
+			monitor.write("Reis")
+			monitor.setCursorPos(1, 2)
+			monitor.write("Eve")
+			monitor.setCursorPos(1, 3)
+			monitor.write("Hos")
+			monitor.setCursorPos(1, 4)
+			monitor.write("Geldin")
+		else
+			for i = 1, 3 do
+				local a = i
+				local b = 6 - i
+				monitor.setCursorPos(a + 1, a)
+				monitor.write("X")
+				monitor.setCursorPos(a + 1, b)
+				monitor.write("X")
+				monitor.setCursorPos(b + 1, a)
+				monitor.write("X")
+				monitor.setCursorPos(b + 1, b)
+				monitor.write("X")
+			end
+		end
+
+		sleep(0.2)
+	end
+end
+
+loop()
