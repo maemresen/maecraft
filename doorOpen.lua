@@ -5,13 +5,12 @@ local proximity = sensor.wrap("top")
 local acceptedPlayer = {}
 acceptedPlayer["lxpenguin"] = true
 
-
 local monitor = peripheral.wrap("monitor_5")
 
 while true do
 	sleep(0.2)
 	local doorOpen = false
-	for name,value in pairs(proximity.getTargets()) do
+	for name, value in pairs(proximity.getTargets()) do
 		if value["IsPlayer"] and value["Username"] then
 			local username = value["Username"]
 			local pos = value["Position"]
@@ -23,7 +22,7 @@ while true do
 			doorOpen = inRange
 		end
 	end
-	
+
 	monitor.clear("=)")
 	monitor.setCursorPos(1, 1)
 	if doorOpen then
@@ -31,6 +30,6 @@ while true do
 		monitor.write("=)")
 	else
 		monitor.write("X")
-	end	
+	end
 	redstone.setOutput("back", doorOpen)
 end
