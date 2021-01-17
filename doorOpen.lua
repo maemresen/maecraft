@@ -1,21 +1,35 @@
 os.loadAPI("ocs/apis/sensor")
 
+--
 -- Peripheral Devices
+--
 local proximity = sensor.wrap("top")
 local monitor = peripheral.wrap("monitor_5")
 
+--
 -- Local Variables
+--
 local acceptedPlayer = {}
 acceptedPlayer["lxpenguin"] = true
 local doorOpen = false
 
+
 while true do
+
 	local playerFound = false
+
+	--
+	-- Check each entity detected by proximity sensor
+	--
 	for name, value in pairs(proximity.getTargets()) do
 		if playerFound then
 			break
 		end
+
 		if value["IsPlayer"] then
+			--
+			-- Check only players
+			--
 			local username = value["Username"]
 			local pos = value["Position"]
 			local x = pos["X"]
@@ -23,7 +37,6 @@ while true do
 			local z = pos["Z"]
 			local inRange = (y == -1) and (-3 < x and x < 0) and (-4.5 < z and z < 0)
 			--print("x=",x, ", y=", y, ", z=", z)
-
 			if inRange then
 				if not doorOpen then
 					monitor.clear()
@@ -44,7 +57,7 @@ while true do
 
 	doorOpen = playerFound or false
 	redstone.setOutput("back", doorOpen)
-
+	
 	monitor.clear()
 	if doorOpen then
 		monitor.setCursorPos(1, 1)
