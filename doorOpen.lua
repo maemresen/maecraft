@@ -1,6 +1,6 @@
 os.loadAPI("ocs/apis/sensor")
 
--- Periphal Devices
+-- Peripheral Devices
 local proximity = sensor.wrap("top")
 local monitor = peripheral.wrap("monitor_5")
 
@@ -10,8 +10,6 @@ acceptedPlayer["lxpenguin"] = true
 local doorOpen = false
 
 while true do
-	sleep(0.2)
-
 	local playerFound = false
 	for name, value in pairs(proximity.getTargets()) do
 		if playerFound then
@@ -37,7 +35,7 @@ while true do
 					monitor.write("Hold")
 					monitor.setCursorPos(1, 4)
 					monitor.write("On :)")
-					sleep(2)
+					sleep(0.5)
 				end
 				playerFound = acceptedPlayer[username]
 			end
@@ -71,4 +69,6 @@ while true do
 			monitor.write("X")
 		end
 	end
+
+	sleep(0.2)
 end
